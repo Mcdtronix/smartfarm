@@ -1,0 +1,817 @@
+{% extends 'base.html' %} 
+{% block title %}Expert Dashboard - FarmSmart{%endblock %} 
+{% block content %}
+<section class="expert-dashboard-section">
+  <div class="container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <div class="welcome-info">
+          <h1>Welcome back, {{ user.get_full_name }}!</h1>
+          <p>Manage your consultations and help farmers succeed</p>
+        </div>
+        <div class="header-actions">
+          <a
+            href="{% url 'main:edit_expert_profile' %}"
+            class="btn btn-outline"
+          >
+            <i class="fas fa-user-edit"></i>
+            <span>Edit Profile</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-handshake"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ total_consultations }}</h3>
+          <p>Total Consultations</p>
+        </div>
+      </div>
+
+      <div class="stat-card pending">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ pending_consultations }}</h3>
+          <p>Pending Requests</p>
+        </div>
+      </div>
+
+      <div class="stat-card active">
+        <div class="stat-icon">
+          <i class="fas fa-tasks"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ active_consultations }}</h3>
+          <p>Active Consultations</p>
+        </div>
+      </div>
+
+      <div class="stat-card completed">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+          <h3>{{ completed_consultations }}</h3>
+          <p>Completed</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="dashboard-grid">
+      <!-- Expert Profile Card -->
+      <div class="dashboard-card profile-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-user-tie"></i>
+            <h3>Your Profile</h3>
+          </div>
+          <a href="{% url 'main:edit_expert_profile' %}" class="edit-link">
+            <i class="fas fa-edit"></i>
+          </a>
+        </div>
+        <div class="profile-summary">
+          <div class="profile-item">
+            <strong>Specialization:</strong>
+            <span>{{ profile.specialization|default:"Not specified" }}</span>
+          </div>
+          <div class="profile-item">
+            <strong>Experience:</strong>
+            <span>{{ profile.experience_years }} years</span>
+          </div>
+          <div class="profile-item">
+            <strong>Location:</strong>
+            <span>{{ profile.location|default:"Not specified" }}</span>
+          </div>
+          {% if profile.hourly_rate %}
+          <div class="profile-item">
+            <strong>Hourly Rate:</strong>
+            <span>${{ profile.hourly_rate }}</span>
+          </div>
+          {% endif %}
+          <div class="profile-item">
+            <strong>Status:</strong>
+            <span
+              class="status status-{% if profile.is_verified %}verified{% else %}pending{% endif %}"
+            >
+              {% if profile.is_verified %}Verified{% else %}Pending
+              Verification{% endif %}
+            </span>
+          </div>
+        </div>
+
+        <!-- Document Verification Section -->
+        <div class="verification-section">
+          <h4>Verification Documents</h4>
+          <div class="document-list">
+            <div class="document-item">
+              <i class="fas fa-certificate"></i>
+              <span>Certificate of Practice</span>
+              {% if profile.certificate_of_practice %}
+              <a
+                href="{{ profile.certificate_of_practice.url }}"
+                target="_blank"
+                class="view-doc"
+              >
+                <i class="fas fa-eye"></i> View
+              </a>
+              {% else %}
+              <span class="missing">Not uploaded</span>
+              {% endif %}
+            </div>
+            <div class="document-item">
+              <i class="fas fa-id-card"></i>
+              <span>ID Document</span>
+              {% if profile.id_document %}
+              <a
+                href="{{ profile.id_document.url }}"
+                target="_blank"
+                class="view-doc"
+              >
+                <i class="fas fa-eye"></i> View
+              </a>
+              {% else %}
+              <span class="missing">Not uploaded</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Consultations -->
+      <div class="dashboard-card consultations-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-comments"></i>
+            <h3>Recent Consultations</h3>
+          </div>
+          <a href="#" class="view-all-link">View All</a>
+        </div>
+        <div class="consultations-list">
+          {% if consultations %} {% for consultation in consultations %}
+          <div class="consultation-item">
+            <div class="consultation-header">
+              <h4>{{ consultation.subject }}</h4>
+              <span class="status status-{{ consultation.status }}">
+                {{ consultation.get_status_display }}
+              </span>
+            </div>
+            <div class="consultation-meta">
+              <span class="customer">
+                <i class="fas fa-user"></i>
+                {{ consultation.customer.get_full_name }}
+              </span>
+              <span class="date">
+                <i class="fas fa-calendar"></i>
+                {{ consultation.created_at|date:"M d, Y" }}
+              </span>
+            </div>
+            <div class="consultation-actions">
+              <a
+                href="{% url 'main:respond_consultation' consultation.id %}"
+                class="btn btn-sm btn-primary"
+              >
+                <i class="fas fa-reply"></i>
+                Respond
+              </a>
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <div class="no-data">
+            <i class="fas fa-comments"></i>
+            <p>No consultations yet.</p>
+            <small
+              >Consultations will appear here when farmers request your
+              expertise.</small
+            >
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Community Posts -->
+      <div class="dashboard-card community-card">
+        <div class="card-header">
+          <div class="card-title">
+            <i class="fas fa-users"></i>
+            <h3>Your Community Posts</h3>
+          </div>
+          <a href="{% url 'main:index' %}#community" class="view-all-link"
+            >View All</a
+          >
+        </div>
+        <div class="posts-list">
+          {% if recent_posts %} {% for post in recent_posts %}
+          <div class="post-item">
+            <div class="post-header">
+              <h4>{{ post.title }}</h4>
+              <span class="post-date">{{ post.created_at|date:"M d" }}</span>
+            </div>
+            <p class="post-content">{{ post.content|truncatewords:20 }}</p>
+            <div class="post-stats">
+              <span class="likes">
+                <i class="fas fa-heart"></i>
+                {{ post.likes_count }}
+              </span>
+              <span class="comments">
+                <i class="fas fa-comment"></i>
+                {{ post.comments_count }}
+              </span>
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <div class="no-data">
+            <i class="fas fa-users"></i>
+            <p>No posts yet.</p>
+            <a
+              href="{% url 'main:index' %}#community"
+              class="btn btn-sm btn-outline"
+            >
+              <i class="fas fa-plus"></i>
+              Share your expertise!
+            </a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% block extra_css %}
+<style>
+  /* Expert Dashboard Styles */
+  .expert-dashboard-section {
+    padding: 40px 0;
+    background: var(--bg-secondary);
+    min-height: calc(100vh - 80px);
+  }
+
+  .dashboard-header {
+    margin-bottom: 40px;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-light);
+  }
+
+  .welcome-info h1 {
+    color: var(--text-primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .welcome-info p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .header-actions .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid var(--border-light);
+    background: transparent;
+    color: var(--text-secondary);
+  }
+
+  .header-actions .btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--primary);
+  }
+
+  /* Statistics Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--white);
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-large);
+  }
+
+  .stat-card.pending {
+    border-left: 4px solid #f57c00;
+  }
+
+  .stat-card.active {
+    border-left: 4px solid var(--info);
+  }
+
+  .stat-card.completed {
+    border-left: 4px solid var(--success);
+  }
+
+  .stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--white);
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  }
+
+  .stat-card.pending .stat-icon {
+    background: linear-gradient(135deg, #f57c00, #ff9800);
+  }
+
+  .stat-card.active .stat-icon {
+    background: linear-gradient(135deg, var(--info), #42a5f5);
+  }
+
+  .stat-card.completed .stat-icon {
+    background: linear-gradient(135deg, var(--success), #66bb6a);
+  }
+
+  .stat-content h3 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .stat-content p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 4px 0 0 0;
+  }
+
+  /* Dashboard Grid */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+
+  .dashboard-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .card-title i {
+    color: var(--primary);
+    font-size: 1.2rem;
+  }
+
+  .card-title h3 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .edit-link,
+  .view-all-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .edit-link:hover,
+  .view-all-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  /* Profile Card */
+  .profile-card {
+    grid-row: span 2;
+  }
+
+  .profile-summary {
+    padding: 24px 32px;
+  }
+
+  .profile-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .profile-item:last-child {
+    border-bottom: none;
+  }
+
+  .profile-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .profile-item span {
+    color: var(--text-secondary);
+  }
+
+  .status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .status-verified {
+    background: rgba(46, 125, 50, 0.1);
+    color: var(--success);
+  }
+
+  .status-pending {
+    background: rgba(255, 193, 7, 0.1);
+    color: #f57c00;
+  }
+
+  /* Verification Section */
+  .verification-section {
+    padding: 24px 32px;
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-secondary);
+  }
+
+  .verification-section h4 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  .document-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .document-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--white);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+  }
+
+  .document-item i {
+    color: var(--primary);
+    width: 20px;
+  }
+
+  .document-item span {
+    flex: 1;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .view-doc {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .view-doc:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  .missing {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* Consultations Card */
+  .consultations-list {
+    padding: 24px 32px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .consultation-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .consultation-item:last-child {
+    border-bottom: none;
+  }
+
+  .consultation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .consultation-header h4 {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .consultation-meta {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .consultation-meta span {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .consultation-meta i {
+    color: var(--primary);
+    width: 12px;
+  }
+
+  .consultation-actions .btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: var(--white);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-small);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+  }
+
+  .btn-outline:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--primary);
+  }
+
+  /* Community Card */
+  .posts-list {
+    padding: 24px 32px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  .post-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .post-item:last-child {
+    border-bottom: none;
+  }
+
+  .post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .post-header h4 {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .post-date {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .post-content {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .post-stats {
+    display: flex;
+    gap: 16px;
+  }
+
+  .post-stats span {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .post-stats i {
+    color: var(--primary);
+    width: 12px;
+  }
+
+  /* No Data States */
+  .no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+
+  .no-data i {
+    font-size: 3rem;
+    color: var(--border-light);
+    margin-bottom: 16px;
+  }
+
+  .no-data p {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .no-data small {
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .profile-card {
+      grid-row: span 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .expert-dashboard-section {
+      padding: 20px 0;
+    }
+
+    .header-content {
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .welcome-info h1 {
+      font-size: 2rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .stat-card {
+      padding: 20px;
+      flex-direction: column;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .stat-icon {
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+    }
+
+    .stat-content h3 {
+      font-size: 2rem;
+    }
+
+    .card-header {
+      padding: 20px 24px 12px;
+    }
+
+    .profile-summary,
+    .consultations-list,
+    .posts-list {
+      padding: 20px 24px;
+    }
+
+    .verification-section {
+      padding: 20px 24px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .header-content {
+      padding: 20px;
+    }
+
+    .welcome-info h1 {
+      font-size: 1.8rem;
+    }
+
+    .stat-card {
+      padding: 16px;
+    }
+
+    .card-header {
+      padding: 16px 20px 8px;
+    }
+
+    .profile-summary,
+    .consultations-list,
+    .posts-list {
+      padding: 16px 20px;
+    }
+
+    .verification-section {
+      padding: 16px 20px;
+    }
+  }
+</style>
+{% endblock %} {% endblock %}

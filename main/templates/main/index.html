@@ -1,220 +1,289 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<!-- Hero Section -->
+<section class="hero">
+  <div class="container">
+    <h1>Smart Farming with AI-Powered Insights</h1>
+    <p>
+      Get personalized crop recommendations, weather alerts, and connect with
+      agricultural experts to maximize your farm's potential.
+    </p>
+    <button
+      class="btn btn-primary"
+      style="background: white; color: var(--primary)"
+    >
+      Get Started
+    </button>
+  </div>
+</section>
 
-{% block content %}
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1>Smart Farming with AI-Powered Insights</h1>
-            <p>Get personalized crop recommendations, weather alerts, and connect with agricultural experts to maximize your farm's potential.</p>
-            <button class="btn btn-primary" style="background: white; color: var(--primary);">Get Started</button>
-        </div>
-    </section>
+<!-- Crop Recommendation Section -->
+<section id="recommendations">
+  <div class="container">
+    <div class="section-title">
+      <h2>Personalized Crop Recommendations</h2>
+      <p>
+        Enter your farm details to receive AI-powered crop suggestions tailored
+        to your specific conditions
+      </p>
+    </div>
 
-    <!-- Crop Recommendation Section -->
-    <section id="recommendations">
-        <div class="container">
-            <div class="section-title">
-                <h2>Personalized Crop Recommendations</h2>
-                <p>Enter your farm details to receive AI-powered crop suggestions tailored to your specific conditions</p>
-            </div>
-            
-            <div class="grid-2">
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-tractor"></i>
-                        <h3>Farm Information</h3>
-                    </div>
-                    <form id="farm-form">
-                        <div class="form-group">
-                            <label for="land-size">Land Size (acres)</label>
-                            <input type="number" id="land-size" min="0.1" step="0.1" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="soil-type">Soil Type</label>
-                            <select id="soil-type" required>
-                                <option value="">Select Soil Type</option>
-                                <option value="loamy">Loamy</option>
-                                <option value="clay">Clay</option>
-                                <option value="sandy">Sandy</option>
-                                <option value="silt">Silt</option>
-                                <option value="peat">Peat</option>
-                                <option value="chalky">Chalky</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" id="location" placeholder="Enter your region" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="fertilizer">Fertilizer Type</label>
-                            <select id="fertilizer" required>
-                                <option value="">Select Fertilizer</option>
-                                <option value="organic">Organic</option>
-                                <option value="urea">Urea</option>
-                                <option value="dap">DAP</option>
-                                <option value="npk">NPK</option>
-                                <option value="compost">Compost</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="water-access">Water Access</label>
-                            <select id="water-access" required>
-                                <option value="">Select Water Access</option>
-                                <option value="rainfed">Rainfed</option>
-                                <option value="irrigation">Irrigation</option>
-                                <option value="mixed">Mixed</option>
-                            </select>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Get Recommendations</button>
-                    </form>
-                </div>
-                
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-chart-bar"></i>
-                        <h3>Recommended Crops</h3>
-                    </div>
-                    <div id="recommendation-results">
-                        <p>Fill out the form to see personalized crop recommendations based on your farm conditions.</p>
-                    </div>
-                </div>
-            </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-tractor"></i>
+          <h3>Farm Information</h3>
         </div>
-    </section>
+        <form id="farm-form">
+          <div class="form-group">
+            <label for="land-size">Land Size (acres)</label>
+            <input type="number" id="land-size" min="0.1" step="0.1" required />
+          </div>
 
-    <!-- Weather Alerts Section -->
-    <section id="weather" style="background: #f5f5f5;">
-        <div class="container">
-            <div class="section-title">
-                <h2>Weather Alerts & Seasonal Planning</h2>
-                <p>Stay informed about weather conditions and optimal planting times</p>
-            </div>
-            
-            <div class="weather-alert">
-                <i class="fas fa-exclamation-triangle" style="color: var(--secondary); font-size: 1.5rem;"></i>
-                <div>
-                    <h3>Heavy Rainfall Alert</h3>
-                    <p>Expect heavy rainfall in the next 48 hours. Consider delaying fertilizer application.</p>
-                </div>
-            </div>
-            
-            <div class="grid-3">
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-cloud-sun"></i>
-                        <h3>7-Day Forecast</h3>
-                    </div>
-                    <div id="weather-forecast">
-                        <p>Loading weather data...</p>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-calendar-alt"></i>
-                        <h3>Seasonal Planning</h3>
-                    </div>
-                    <ul>
-                        <li>Optimal maize planting window: Oct 15 - Nov 10</li>
-                        <li>Wheat harvesting recommended: Early September</li>
-                        <li>Vegetable rotation schedule available</li>
-                    </ul>
-                </div>
-                
-                <div class="card">
-                    <div class="card-title">
-                        <i class="fas fa-tint"></i>
-                        <h3>Irrigation Advice</h3>
-                    </div>
-                    <p>Based on current soil moisture levels, reduce irrigation frequency by 20% this week.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+          <div class="form-group">
+            <label for="soil-type">Soil Type</label>
+            <select id="soil-type" required>
+              <option value="">Select Soil Type</option>
+              <option value="loamy">Loamy</option>
+              <option value="clay">Clay</option>
+              <option value="sandy">Sandy</option>
+              <option value="silt">Silt</option>
+              <option value="peat">Peat</option>
+              <option value="chalky">Chalky</option>
+            </select>
+          </div>
 
-    <!-- Community Section -->
-    <section id="community">
-        <div class="container">
-            <div class="section-title">
-                <h2>Farming Community</h2>
-                <p>Share experiences and learn from fellow farmers</p>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-pencil-alt"></i>
-                    <h3>Share Your Update</h3>
-                </div>
-                <form id="blog-form">
-                    <div class="form-group">
-                        <textarea id="blog-content" placeholder="Share your farming experiences, challenges, or successes..." rows="3"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Post Update</button>
-                </form>
-            </div>
-            
-            <div id="blog-posts">
-                <div class="blog-post">
-                    <div class="blog-meta">
-                        <span><i class="fas fa-user"></i> Samuel K.</span>
-                        <span><i class="far fa-clock"></i> 2 days ago</span>
-                    </div>
-                    <p>Just harvested my maize crop with a 15% higher yield than last season thanks to the fertilizer recommendations from FarmSmart!</p>
-                </div>
-                
-                <div class="blog-post">
-                    <div class="blog-meta">
-                        <span><i class="fas fa-user"></i> Maria J.</span>
-                        <span><i class="far fa-clock"></i> 5 days ago</span>
-                    </div>
-                    <p>Dealing with a pest issue in my vegetable garden. Any organic solutions that have worked for others?</p>
-                </div>
-            </div>
-        </div>
-    </section>
+          <div class="form-group">
+            <label for="location">Location</label>
+            <input
+              type="text"
+              id="location"
+              placeholder="Enter your region"
+              required
+            />
+          </div>
 
-    <!-- Experts Section -->
-    <section id="experts" style="background: #f5f5f5;">
-        <div class="container">
-            <div class="section-title">
-                <h2>Agricultural Experts</h2>
-                <p>Connect with certified agricultural experts for personalized advice</p>
-            </div>
-            
-            <div class="grid-3">
-                <div class="card expert-card">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Expert" class="expert-img">
-                    <h3>Dr. Robert Kimani</h3>
-                    <p>Soil Scientist</p>
-                    <p>10 years experience</p>
-                    <button class="btn btn-outline" style="margin-top: 15px;">Contact Expert</button>
-                </div>
-                
-                <div class="card expert-card">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Expert" class="expert-img">
-                    <h3>Dr. Amina Omondi</h3>
-                    <p>Crop Protection Specialist</p>
-                    <p>8 years experience</p>
-                    <button class="btn btn-outline" style="margin-top: 15px;">Contact Expert</button>
-                </div>
-                
-                <div class="card expert-card">
-                    <img src="https://randomuser.me/api/portraits/men/76.jpg" alt="Expert" class="expert-img">
-                    <h3>Prof. James Otieno</h3>
-                    <p>Agricultural Economist</p>
-                    <p>15 years experience</p>
-                    <button class="btn btn-outline" style="margin-top: 15px;">Contact Expert</button>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn btn-primary">View All Experts</button>
-            </div>
+          <div class="form-group">
+            <label for="fertilizer">Fertilizer Type</label>
+            <select id="fertilizer" required>
+              <option value="">Select Fertilizer</option>
+              <option value="organic">Organic</option>
+              <option value="urea">Urea</option>
+              <option value="dap">DAP</option>
+              <option value="npk">NPK</option>
+              <option value="compost">Compost</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="water-access">Water Access</label>
+            <select id="water-access" required>
+              <option value="">Select Water Access</option>
+              <option value="rainfed">Rainfed</option>
+              <option value="irrigation">Irrigation</option>
+              <option value="mixed">Mixed</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            Get Recommendations
+          </button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-chart-bar"></i>
+          <h3>Recommended Crops</h3>
         </div>
-    </section>
+        <div id="recommendation-results">
+          <p>
+            Fill out the form to see personalized crop recommendations based on
+            your farm conditions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Weather Alerts Section -->
+<section id="weather" style="background: #f5f5f5">
+  <div class="container">
+    <div class="section-title">
+      <h2>Weather Alerts & Seasonal Planning</h2>
+      <p>Stay informed about weather conditions and optimal planting times</p>
+    </div>
+
+    <div class="weather-alert">
+      <i
+        class="fas fa-exclamation-triangle"
+        style="color: var(--secondary); font-size: 1.5rem"
+      ></i>
+      <div>
+        <h3>Heavy Rainfall Alert</h3>
+        <p>
+          Expect heavy rainfall in the next 48 hours. Consider delaying
+          fertilizer application.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-cloud-sun"></i>
+          <h3>7-Day Forecast</h3>
+        </div>
+        <div id="weather-forecast">
+          <p>Loading weather data...</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-calendar-alt"></i>
+          <h3>Seasonal Planning</h3>
+        </div>
+        <ul>
+          <li>Optimal maize planting window: Oct 15 - Nov 10</li>
+          <li>Wheat harvesting recommended: Early September</li>
+          <li>Vegetable rotation schedule available</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fas fa-tint"></i>
+          <h3>Irrigation Advice</h3>
+        </div>
+        <p>
+          Based on current soil moisture levels, reduce irrigation frequency by
+          20% this week.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Community Section -->
+<section id="community">
+  <div class="container">
+    <div class="section-title">
+      <h2>Farming Community</h2>
+      <p>Share experiences and learn from fellow farmers</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <i class="fas fa-pencil-alt"></i>
+        <h3>Share Your Update</h3>
+      </div>
+      <form id="blog-form">
+        <div class="form-group">
+          <textarea
+            id="blog-content"
+            placeholder="Share your farming experiences, challenges, or successes..."
+            rows="3"
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Update</button>
+      </form>
+    </div>
+
+    <div id="blog-posts">
+      {% for post in recent_posts %}
+      <div class="blog-post">
+        <div class="blog-meta">
+          <span><i class="fas fa-user"></i> {{ post.author_name }}</span>
+          <span
+            ><i class="far fa-clock"></i> {{ post.created_at|timesince }}
+            ago</span
+          >
+        </div>
+        <p>{{ post.content }}</p>
+      </div>
+      {% empty %}
+      <div class="blog-post">
+        <div class="blog-meta">
+          <span><i class="fas fa-user"></i> Samuel K.</span>
+          <span><i class="far fa-clock"></i> 2 days ago</span>
+        </div>
+        <p>
+          Just harvested my maize crop with a 15% higher yield than last season
+          thanks to the fertilizer recommendations from FarmSmart!
+        </p>
+      </div>
+
+      <div class="blog-post">
+        <div class="blog-meta">
+          <span><i class="fas fa-user"></i> Maria J.</span>
+          <span><i class="far fa-clock"></i> 5 days ago</span>
+        </div>
+        <p>
+          Dealing with a pest issue in my vegetable garden. Any organic
+          solutions that have worked for others?
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Experts Section -->
+<section id="experts" style="background: #f5f5f5">
+  <div class="container">
+    <div class="section-title">
+      <h2>Agricultural Experts</h2>
+      <p>Connect with certified agricultural experts for personalized advice</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card expert-card">
+        <img
+          src="https://randomuser.me/api/portraits/men/32.jpg"
+          alt="Expert"
+          class="expert-img"
+        />
+        <h3>Dr. Robert Kimani</h3>
+        <p>Soil Scientist</p>
+        <p>10 years experience</p>
+        <button class="btn btn-outline" style="margin-top: 15px">
+          Contact Expert
+        </button>
+      </div>
+
+      <div class="card expert-card">
+        <img
+          src="https://randomuser.me/api/portraits/women/44.jpg"
+          alt="Expert"
+          class="expert-img"
+        />
+        <h3>Dr. Amina Omondi</h3>
+        <p>Crop Protection Specialist</p>
+        <p>8 years experience</p>
+        <button class="btn btn-outline" style="margin-top: 15px">
+          Contact Expert
+        </button>
+      </div>
+
+      <div class="card expert-card">
+        <img
+          src="https://randomuser.me/api/portraits/men/76.jpg"
+          alt="Expert"
+          class="expert-img"
+        />
+        <h3>Prof. James Otieno</h3>
+        <p>Agricultural Economist</p>
+        <p>15 years experience</p>
+        <button class="btn btn-outline" style="margin-top: 15px">
+          Contact Expert
+        </button>
+      </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px">
+      <button class="btn btn-primary">View All Experts</button>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -124,3 +124,16 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Custom User Model (temporarily disabled)
+# AUTH_USER_MODEL = 'main.User'
+
+# Login/Logout URLs
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGOUT_REDIRECT_URL = '/'
+
+# Weather API Configuration
+OPENWEATHER_API_KEY = 'a241dd8eb7b35f0bb8e021e09f9408ad'  # Replace with your actual API key
+OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5'
+# Default location: Harare, Zimbabwe (ZW)

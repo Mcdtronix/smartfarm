@@ -1,78 +1,231 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FarmSmart - AI-Powered Agricultural Advisor{% endblock %}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      {% block title %}FarmSmart - AI-Powered Agricultural Advisor{% endblock %}
+    </title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     {% block extra_css %}{% endblock %}
-</head>
-<body>
+  </head>
+  <body>
     <!-- Header -->
     <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-seedling"></i>
-                    <span>FarmSmart</span>
+      <div class="container">
+        <div class="header-content">
+          <div class="logo">
+            <i class="fas fa-seedling"></i>
+            <span>FarmSmart</span>
+          </div>
+          <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+          </button>
+          <nav class="main-nav">
+            <ul class="nav-menu">
+              <li class="nav-item">
+                <a href="{% url 'main:index' %}" class="nav-link">
+                  <i class="fas fa-home"></i>
+                  <span>Home</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  href="{% url 'main:index' %}#recommendations"
+                  class="nav-link"
+                >
+                  <i class="fas fa-seedling"></i>
+                  <span>Crop Recommendations</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'main:index' %}#weather" class="nav-link">
+                  <i class="fas fa-cloud-sun"></i>
+                  <span>Weather</span>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{% url 'main:index' %}#community" class="nav-link">
+                  <i class="fas fa-users"></i>
+                  <span>Community</span>
+                </a>
+              </li>
+              {% if not user.profile.is_expert %}
+              <li class="nav-item">
+                <a href="{% url 'main:expert_list' %}" class="nav-link">
+                  <i class="fas fa-user-tie"></i>
+                  <span>Experts</span>
+                </a>
+              </li>
+              {% endif %} {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a href="{% url 'main:logout' %}" class="nav-link logout-link">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Logout</span>
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          <div class="auth-section">
+            {% if user.is_authenticated %}
+            <div class="user-profile">
+              <div class="user-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="user-info">
+                <span class="user-name">{{ user.get_full_name }}</span>
+                <span class="user-role">
+                  {% if user.profile.is_expert %}Expert{% else %}Farmer{% endif%}
+                </span>
+              </div>
+              <div class="user-dropdown">
+                <button class="dropdown-toggle" onclick="toggleUserMenu()">
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown-menu" id="userDropdown">
+                  {% if user.profile.is_expert %}
+                  <a
+                    href="{% url 'main:expert_dashboard' %}"
+                    class="dropdown-item"
+                  >
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Expert Dashboard</span>
+                  </a>
+                  <a
+                    href="{% url 'main:edit_expert_profile' %}"
+                    class="dropdown-item"
+                  >
+                    <i class="fas fa-user-edit"></i>
+                    <span>Edit Profile</span>
+                  </a>
+                  {% else %}
+                  <a href="{% url 'main:dashboard' %}" class="dropdown-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                  </a>
+                  <a href="{% url 'main:my_farm_data' %}" class="dropdown-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>My Farm Data</span>
+                  </a>
+                  {% endif %}
+                  <div class="dropdown-divider"></div>
+                  <a
+                    href="{% url 'main:logout' %}"
+                    class="dropdown-item logout"
+                  >
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                  </a>
                 </div>
-                <nav>
-                    <ul>
-                        <li><a href="#recommendations">Crop Recommendations</a></li>
-                        <li><a href="#weather">Weather Alerts</a></li>
-                        <li><a href="#community">Community</a></li>
-                        <li><a href="#experts">Experts</a></li>
-                    </ul>
-                </nav>
-                <div class="auth-buttons">
-                    <button class="btn btn-outline">Login</button>
-                    <button class="btn btn-primary">Sign Up</button>
-                </div>
+              </div>
             </div>
+            {% else %}
+            <div class="auth-buttons">
+              <a href="{% url 'main:login' %}" class="btn btn-outline">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login</span>
+              </a>
+              <a href="{% url 'main:register' %}" class="btn btn-primary">
+                <i class="fas fa-user-plus"></i>
+                <span>Sign Up</span>
+              </a>
+            </div>
+            {% endif %}
+          </div>
         </div>
+      </div>
     </header>
 
-    {% block content %}
-    {% endblock %}
+    {% block content %} {% endblock %}
 
     <!-- Footer -->
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>FarmSmart</h3>
-                    <p>AI-powered agricultural advisory platform helping farmers maximize yields through data-driven insights.</p>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#recommendations">Crop Recommendations</a></li>
-                        <li><a href="#weather">Weather Alerts</a></li>
-                        <li><a href="#community">Community</a></li>
-                        <li><a href="#experts">Experts</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Contact Us</h3>
-                    <ul>
-                        <li><i class="fas fa-envelope"></i> info@farmsmart.com</li>
-                        <li><i class="fas fa-phone"></i> +254 700 123 456</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Nairobi, Kenya</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; 2023 FarmSmart. All rights reserved.</p>
-            </div>
+      <div class="container">
+        <div class="footer-content">
+          <div class="footer-column">
+            <h3>FarmSmart</h3>
+            <p>
+              AI-powered agricultural advisory platform helping farmers maximize
+              yields through data-driven insights.
+            </p>
+          </div>
+
+          <div class="footer-column">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="{% url 'main:index' %}">Home</a></li>
+              <li>
+                <a href="{% url 'main:index' %}#recommendations"
+                  >Crop Recommendations</a
+                >
+              </li>
+              <li>
+                <a href="{% url 'main:index' %}#weather">Weather Alerts</a>
+              </li>
+              <li><a href="{% url 'main:index' %}#community">Community</a></li>
+              <li><a href="{% url 'main:index' %}#experts">Experts</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-column">
+            <h3>Contact Us</h3>
+            <ul>
+              <li><i class="fas fa-envelope"></i> info@farmsmart.com</li>
+              <li><i class="fas fa-phone"></i> +263 700 123 456</li>
+              <li><i class="fas fa-map-marker-alt"></i> Harare, Zimbabwe</li>
+            </ul>
+          </div>
         </div>
+
+        <div class="copyright">
+          <p>&copy; 2023 FarmSmart. All rights reserved.</p>
+        </div>
+      </div>
     </footer>
 
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
-</body>
+
+    <script>
+      // Mobile menu toggle
+      function toggleMobileMenu() {
+        const nav = document.querySelector(".main-nav");
+        const toggle = document.querySelector(".mobile-menu-toggle");
+        nav.classList.toggle("active");
+        toggle.classList.toggle("active");
+      }
+
+      // User dropdown toggle
+      function toggleUserMenu() {
+        const dropdown = document.getElementById("userDropdown");
+        dropdown.classList.toggle("show");
+      }
+
+      // Close dropdowns when clicking outside
+      document.addEventListener("click", function (event) {
+        const userDropdown = document.getElementById("userDropdown");
+        const userProfile = document.querySelector(".user-profile");
+
+        if (userDropdown && !userProfile.contains(event.target)) {
+          userDropdown.classList.remove("show");
+        }
+      });
+
+      // Close mobile menu when clicking on a link
+      document.querySelectorAll(".nav-link").forEach((link) => {
+        link.addEventListener("click", () => {
+          const nav = document.querySelector(".main-nav");
+          const toggle = document.querySelector(".mobile-menu-toggle");
+          nav.classList.remove("active");
+          toggle.classList.remove("active");
+        });
+      });
+    </script>
+  </body>
 </html>

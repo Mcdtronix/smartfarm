@@ -1,0 +1,342 @@
+{% extends 'base.html' %} {% block title %}Dashboard - FarmSmart{% endblock %}
+{% block content %}
+<section class="dashboard-section">
+  <div class="container">
+    <div class="dashboard-header">
+      <h1>Welcome back, {{ user.get_full_name }}!</h1>
+      <p>Manage your farm data and get personalized recommendations</p>
+    </div>
+
+    <div class="dashboard-grid">
+      <!-- Quick Actions -->
+      <div class="dashboard-card">
+        <div class="card-title">
+          <i class="fas fa-bolt"></i>
+          <h3>Quick Actions</h3>
+        </div>
+        <div class="quick-actions">
+          <a href="{% url 'main:index' %}#recommendations" class="action-btn">
+            <i class="fas fa-seedling"></i>
+            <span>Get Crop Recommendations</span>
+          </a>
+          <a href="{% url 'main:expert_list' %}" class="action-btn">
+            <i class="fas fa-user-tie"></i>
+            <span>Find Experts</span>
+          </a>
+          <a href="{% url 'main:my_farm_data' %}" class="action-btn">
+            <i class="fas fa-chart-line"></i>
+            <span>View Farm Data</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Recent Farm Data -->
+      <div class="dashboard-card">
+        <div class="card-title">
+          <i class="fas fa-tractor"></i>
+          <h3>Recent Farm Data</h3>
+        </div>
+        {% if farm_data %} {% for data in farm_data %}
+        <div class="farm-data-item">
+          <div class="farm-data-header">
+            <h4>{{ data.location }}</h4>
+            <span class="date">{{ data.created_at|date:"M d, Y" }}</span>
+          </div>
+          <div class="farm-data-details">
+            <span>{{ data.land_size }} acres</span>
+            <span>{{ data.soil_type|title }} soil</span>
+            <span>{{ data.fertilizer_type|title }} fertilizer</span>
+          </div>
+          <div class="recommendations-count">
+            <i class="fas fa-seedling"></i>
+            {{ data.recommendations.count }} recommendations
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p class="no-data">
+          No farm data yet.
+          <a href="{% url 'main:index' %}#recommendations"
+            >Get your first recommendations!</a
+          >
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Recent Community Posts -->
+      <div class="dashboard-card">
+        <div class="card-title">
+          <i class="fas fa-comments"></i>
+          <h3>Your Community Posts</h3>
+        </div>
+        {% if recent_posts %} {% for post in recent_posts %}
+        <div class="post-item">
+          <div class="post-content">{{ post.content|truncatewords:20 }}</div>
+          <div class="post-date">{{ post.created_at|timesince }} ago</div>
+        </div>
+        {% endfor %} {% else %}
+        <p class="no-data">
+          No posts yet.
+          <a href="{% url 'main:index' %}#community"
+            >Share your farming experience!</a
+          >
+        </p>
+        {% endif %}
+      </div>
+
+      <!-- Recent Consultations -->
+      <div class="dashboard-card">
+        <div class="card-title">
+          <i class="fas fa-handshake"></i>
+          <h3>Expert Consultations</h3>
+        </div>
+        {% if consultations %} {% for consultation in consultations %}
+        <div class="consultation-item">
+          <div class="consultation-header">
+            <h4>{{ consultation.subject }}</h4>
+            <span class="status status-{{ consultation.status }}"
+              >{{ consultation.status|title }}</span
+            >
+          </div>
+          <div class="consultation-expert">
+            <i class="fas fa-user-tie"></i>
+            {{ consultation.expert.get_full_name }}
+          </div>
+          <div class="consultation-date">
+            {{ consultation.created_at|timesince }} ago
+          </div>
+        </div>
+        {% endfor %} {% else %}
+        <p class="no-data">
+          No consultations yet.
+          <a href="{% url 'main:expert_list' %}">Find an expert!</a>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_css %}
+<style>
+  .dashboard-section {
+    padding: 40px 0;
+    background: #f8f9fa;
+    min-height: 100vh;
+  }
+
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .dashboard-header h1 {
+    color: var(--primary-dark);
+    margin-bottom: 10px;
+  }
+
+  .dashboard-header p {
+    color: var(--gray);
+    font-size: 1.1rem;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+
+  .dashboard-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+  }
+
+  .quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--dark);
+    transition: all 0.3s;
+    border: 1px solid transparent;
+  }
+
+  .action-btn:hover {
+    background: var(--primary-light);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .action-btn i {
+    font-size: 1.2rem;
+    color: var(--primary);
+  }
+
+  .action-btn:hover i {
+    color: white;
+  }
+
+  .farm-data-item,
+  .post-item,
+  .consultation-item {
+    padding: 15px 0;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .farm-data-item:last-child,
+  .post-item:last-child,
+  .consultation-item:last-child {
+    border-bottom: none;
+  }
+
+  .farm-data-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .farm-data-header h4 {
+    color: var(--primary-dark);
+    margin: 0;
+  }
+
+  .date {
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+
+  .farm-data-details {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 8px;
+  }
+
+  .farm-data-details span {
+    background: var(--light);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--primary-dark);
+  }
+
+  .recommendations-count {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--primary);
+    font-size: 0.9rem;
+  }
+
+  .post-content {
+    margin-bottom: 8px;
+    color: var(--dark);
+  }
+
+  .post-date {
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+
+  .consultation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .consultation-header h4 {
+    color: var(--primary-dark);
+    margin: 0;
+  }
+
+  .status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .status-pending {
+    background: #fff3e0;
+    color: #f57c00;
+  }
+
+  .status-accepted {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  .status-in_progress {
+    background: #e3f2fd;
+    color: #1976d2;
+  }
+
+  .status-completed {
+    background: #e8f5e9;
+    color: #388e3c;
+  }
+
+  .status-cancelled {
+    background: #ffebee;
+    color: #d32f2f;
+  }
+
+  .consultation-expert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gray);
+    margin-bottom: 5px;
+  }
+
+  .consultation-date {
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+
+  .no-data {
+    text-align: center;
+    color: var(--gray);
+    font-style: italic;
+  }
+
+  .no-data a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+
+  .no-data a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 768px) {
+    .dashboard-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .farm-data-details {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .consultation-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
+</style>
+{% endblock %}
+

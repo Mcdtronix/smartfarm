@@ -1,0 +1,692 @@
+{% extends 'base.html' %} 
+{% block title %}Edit Expert Profile - FarmSmart{% endblock %}
+{% block content %}
+<section class="edit-profile-section">
+  <div class="container">
+    <div class="profile-header">
+      <div class="header-content">
+        <div class="header-info">
+          <h1>Edit Your Expert Profile</h1>
+          <p>Update your information and upload verification documents</p>
+        </div>
+        <div class="header-actions">
+          <a href="{% url 'main:expert_dashboard' %}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Dashboard</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-form-container">
+      <form method="post" enctype="multipart/form-data" class="profile-form">
+        {% csrf_token %}
+
+        <!-- Personal Information -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3>
+              <i class="fas fa-user"></i>
+              Personal Information
+            </h3>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="specialization">
+                <i class="fas fa-graduation-cap"></i>
+                Specialization
+              </label>
+              <input
+                type="text"
+                id="specialization"
+                name="specialization"
+                value="{{ profile.specialization }}"
+                placeholder="e.g., Crop Science, Soil Management, Pest Control"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="experience_years">
+                <i class="fas fa-calendar-alt"></i>
+                Years of Experience
+              </label>
+              <input
+                type="number"
+                id="experience_years"
+                name="experience_years"
+                value="{{ profile.experience_years }}"
+                min="0"
+                max="50"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="certification">
+                <i class="fas fa-certificate"></i>
+                Professional Certifications
+              </label>
+              <input
+                type="text"
+                id="certification"
+                name="certification"
+                value="{{ profile.certification }}"
+                placeholder="e.g., Certified Crop Advisor, Agricultural Engineer"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="hourly_rate">
+                <i class="fas fa-dollar-sign"></i>
+                Hourly Rate (USD)
+              </label>
+              <input
+                type="number"
+                id="hourly_rate"
+                name="hourly_rate"
+                value="{{ profile.hourly_rate }}"
+                step="0.01"
+                min="0"
+                placeholder="50.00"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="location">
+                <i class="fas fa-map-marker-alt"></i>
+                Location
+              </label>
+              <input
+                type="text"
+                id="location"
+                name="location"
+                value="{{ profile.location }}"
+                placeholder="e.g., Harare, Zimbabwe"
+                class="form-control"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="phone_number">
+                <i class="fas fa-phone"></i>
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="phone_number"
+                name="phone_number"
+                value="{{ profile.phone_number }}"
+                placeholder="+263 77 123 4567"
+                class="form-control"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Bio Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3>
+              <i class="fas fa-file-alt"></i>
+              Professional Bio
+            </h3>
+          </div>
+          <div class="form-group">
+            <label for="bio">
+              <i class="fas fa-quote-left"></i>
+              Tell us about your expertise and experience
+            </label>
+            <textarea
+              id="bio"
+              name="bio"
+              rows="6"
+              placeholder="Describe your background, areas of expertise, and how you can help farmers..."
+              class="form-control"
+            >
+{{ profile.bio }}</textarea>
+          </div>
+        </div>
+
+        <!-- Document Upload Section -->
+        <div class="form-section">
+          <div class="section-header">
+            <h3>
+              <i class="fas fa-upload"></i>
+              Verification Documents
+            </h3>
+            <p class="section-description">
+              Upload your professional documents for verification. This helps
+              build trust with farmers.
+            </p>
+          </div>
+
+          <div class="document-upload-grid">
+            <div class="upload-group">
+              <label for="certificate_of_practice">
+                <i class="fas fa-certificate"></i>
+                Certificate of Practice
+              </label>
+              <div class="file-upload-area">
+                <input
+                  type="file"
+                  id="certificate_of_practice"
+                  name="certificate_of_practice"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  class="file-input"
+                />
+                <div class="upload-content">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <small>PDF, JPG, PNG, DOC (Max 10MB)</small>
+                </div>
+              </div>
+              {% if profile.certificate_of_practice %}
+              <div class="current-file">
+                <i class="fas fa-file-pdf"></i>
+                <span
+                  >{{ profile.certificate_of_practice.name|slice:"20:" }}</span
+                >
+                <a
+                  href="{{ profile.certificate_of_practice.url }}"
+                  target="_blank"
+                  class="view-file"
+                >
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="upload-group">
+              <label for="id_document">
+                <i class="fas fa-id-card"></i>
+                ID Document
+              </label>
+              <div class="file-upload-area">
+                <input
+                  type="file"
+                  id="id_document"
+                  name="id_document"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                  class="file-input"
+                />
+                <div class="upload-content">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>Click to upload or drag and drop</p>
+                  <small>PDF, JPG, PNG, DOC (Max 10MB)</small>
+                </div>
+              </div>
+              {% if profile.id_document %}
+              <div class="current-file">
+                <i class="fas fa-file-pdf"></i>
+                <span>{{ profile.id_document.name|slice:"20:" }}</span>
+                <a
+                  href="{{ profile.id_document.url }}"
+                  target="_blank"
+                  class="view-file"
+                >
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <a href="{% url 'main:expert_dashboard' %}" class="btn btn-outline">
+            <i class="fas fa-times"></i>
+            <span>Cancel</span>
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            <span>Save Changes</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  .edit-profile-section {
+    padding: 40px 0;
+    background: var(--bg-secondary);
+    min-height: calc(100vh - 80px);
+  }
+
+  .profile-header {
+    margin-bottom: 40px;
+  }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--white);
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-light);
+  }
+
+  .header-info h1 {
+    color: var(--text-primary);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .header-info p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .header-actions .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: 2px solid var(--border-light);
+    background: transparent;
+    color: var(--text-secondary);
+  }
+
+  .header-actions .btn:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--primary);
+  }
+
+  .profile-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .profile-form {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+  }
+
+  .form-section {
+    padding: 32px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .form-section:last-child {
+    border-bottom: none;
+  }
+
+  .section-header {
+    margin-bottom: 24px;
+  }
+
+  .section-header h3 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-header h3 i {
+    color: var(--primary);
+  }
+
+  .section-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-group label i {
+    color: var(--primary);
+    width: 16px;
+  }
+
+  .form-control {
+    padding: 12px 16px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--white);
+    color: var(--text-primary);
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+  }
+
+  .form-control::placeholder {
+    color: var(--text-muted);
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  /* Document Upload Styles */
+  .document-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .upload-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .upload-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .upload-group label i {
+    color: var(--primary);
+    width: 16px;
+  }
+
+  .file-upload-area {
+    position: relative;
+    border: 2px dashed var(--border-light);
+    border-radius: 8px;
+    padding: 32px 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: var(--bg-secondary);
+  }
+
+  .file-upload-area:hover {
+    border-color: var(--primary);
+    background: rgba(46, 125, 50, 0.05);
+  }
+
+  .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-content i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+
+  .upload-content p {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .upload-content small {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  .current-file {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .current-file i {
+    color: var(--error);
+    font-size: 1.2rem;
+  }
+
+  .current-file span {
+    flex: 1;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .view-file {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .view-file:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  /* Form Actions */
+  .form-actions {
+    padding: 32px;
+    background: var(--bg-secondary);
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+  }
+
+  .btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: var(--white);
+    box-shadow: var(--shadow-small);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 2px solid var(--border-light);
+  }
+
+  .btn-outline:hover {
+    background: var(--white);
+    color: var(--text-primary);
+    border-color: var(--primary);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .edit-profile-section {
+      padding: 20px 0;
+    }
+
+    .header-content {
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .header-info h1 {
+      font-size: 2rem;
+    }
+
+    .form-section {
+      padding: 24px;
+    }
+
+    .form-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .document-upload-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .form-actions {
+      padding: 24px;
+      flex-direction: column;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .header-content {
+      padding: 20px;
+    }
+
+    .header-info h1 {
+      font-size: 1.8rem;
+    }
+
+    .form-section {
+      padding: 20px;
+    }
+
+    .form-actions {
+      padding: 20px;
+    }
+  }
+</style>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // File upload enhancement
+    const fileInputs = document.querySelectorAll(".file-input");
+
+    fileInputs.forEach((input) => {
+      const uploadArea = input.closest(".file-upload-area");
+      const uploadContent = uploadArea.querySelector(".upload-content");
+
+      input.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          uploadContent.innerHTML = `
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                    <p>File selected: ${file.name}</p>
+                    <small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                `;
+          uploadArea.style.borderColor = "var(--success)";
+          uploadArea.style.backgroundColor = "rgba(46, 125, 50, 0.1)";
+        }
+      });
+
+      // Drag and drop functionality
+      uploadArea.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = "var(--primary)";
+        uploadArea.style.backgroundColor = "rgba(46, 125, 50, 0.1)";
+      });
+
+      uploadArea.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        uploadArea.style.borderColor = "var(--border-light)";
+        uploadArea.style.backgroundColor = "var(--bg-secondary)";
+      });
+
+      uploadArea.addEventListener("drop", function (e) {
+        e.preventDefault();
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          input.files = files;
+          input.dispatchEvent(new Event("change"));
+        }
+        uploadArea.style.borderColor = "var(--border-light)";
+        uploadArea.style.backgroundColor = "var(--bg-secondary)";
+      });
+    });
+
+    // Form validation
+    const form = document.querySelector(".profile-form");
+    form.addEventListener("submit", function (e) {
+      const requiredFields = ["specialization", "experience_years", "location"];
+      let isValid = true;
+
+      requiredFields.forEach((fieldName) => {
+        const field = document.getElementById(fieldName);
+        if (!field.value.trim()) {
+          field.style.borderColor = "var(--error)";
+          isValid = false;
+        } else {
+          field.style.borderColor = "var(--border-light)";
+        }
+      });
+
+      if (!isValid) {
+        e.preventDefault();
+        alert("Please fill in all required fields.");
+      }
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,464 @@
+{% extends 'base.html' %} 
+{% block title %}Agricultural Experts - FarmSmart{%endblock %} 
+{% block content %}
+<section class="experts-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Agricultural Experts</h2>
+      <p>Connect with certified agricultural experts for personalized advice</p>
+    </div>
+
+    <div class="experts-grid">
+      {% for expert in experts %}
+      <div class="expert-card">
+        <div class="expert-header">
+          <div class="expert-avatar">
+            <i class="fas fa-user-tie"></i>
+          </div>
+          <div class="expert-info">
+            <h3>{{ expert.get_full_name }}</h3>
+            <p class="expert-specialization">
+              {{ expert.profile.specialization|default:"Agricultural Expert" }}
+            </p>
+            <p class="expert-location">
+              <i class="fas fa-map-marker-alt"></i> {{
+              expert.profile.location|default:"Location not specified" }}
+            </p>
+          </div>
+        </div>
+
+        <div class="expert-details">
+          <div class="expert-stat">
+            <span class="stat-label">Experience</span>
+            <span class="stat-value"
+              >{{ expert.profile.experience_years }} years</span
+            >
+          </div>
+          {% if expert.profile.hourly_rate %}
+          <div class="expert-stat">
+            <span class="stat-label">Rate</span>
+            <span class="stat-value"
+              >${{ expert.profile.hourly_rate }}/hour</span
+            >
+          </div>
+          {% endif %}
+          <div class="expert-stat">
+            <span class="stat-label">Status</span>
+            <span
+              class="stat-value status-{% if expert.profile.is_verified %}verified{% else %}pending{% endif %}"
+            >
+              {% if expert.profile.is_verified %}Verified{% else %}Pending{% endif %}
+            </span>
+          </div>
+        </div>
+
+        {% if expert.profile.bio %}
+        <div class="expert-bio">
+          <p>{{ expert.profile.bio|truncatewords:20 }}</p>
+        </div>
+        {% endif %} {% if expert.profile.certification %}
+        <div class="expert-certification">
+          <i class="fas fa-certificate"></i>
+          <span>{{ expert.profile.certification }}</span>
+        </div>
+        {% endif %}
+
+        <div class="expert-actions">
+          {% if user.is_authenticated and not user.profile.is_expert %}
+          <button
+            class="btn btn-primary"
+            onclick="openConsultationModal({{ expert.id }}, '{{ expert.get_full_name }}')"
+          >
+            Request Consultation
+          </button>
+          {% elif not user.is_authenticated %}
+          <a href="{% url 'main:login' %}" class="btn btn-outline">
+            Login to Contact
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% empty %}
+      <div class="no-experts">
+        <i class="fas fa-user-tie"></i>
+        <h3>No experts available</h3>
+        <p>
+          No verified agricultural experts are currently available. Check back
+          later for expert consultations.
+        </p>
+        {% if not user.is_authenticated %}
+        <a href="{% url 'main:register' %}" class="btn btn-primary">
+          <i class="fas fa-user-plus"></i>
+          Become an Expert
+        </a>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Consultation Request Modal -->
+<div id="consultation-modal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Request Consultation</h3>
+      <span class="close" onclick="closeConsultationModal()">&times;</span>
+    </div>
+    <form id="consultation-form">
+      <div class="form-group">
+        <label for="consultation-subject">Subject</label>
+        <input
+          type="text"
+          id="consultation-subject"
+          name="subject"
+          required
+          placeholder="Brief subject of your consultation"
+        />
+      </div>
+      <div class="form-group">
+        <label for="consultation-description">Description</label>
+        <textarea
+          id="consultation-description"
+          name="description"
+          rows="4"
+          required
+          placeholder="Describe your farming challenge or question in detail..."
+        ></textarea>
+      </div>
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="btn btn-outline"
+          onclick="closeConsultationModal()"
+        >
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary">Send Request</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %} {% block extra_css %}
+<style>
+  .experts-section {
+    padding: 60px 0;
+    background: #f8f9fa;
+  }
+
+  .experts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+  }
+
+  .expert-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+
+  .expert-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .expert-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .expert-avatar {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+  }
+
+  .expert-info h3 {
+    color: var(--primary-dark);
+    margin: 0 0 5px 0;
+  }
+
+  .expert-specialization {
+    color: var(--primary);
+    font-weight: 600;
+    margin: 0 0 5px 0;
+  }
+
+  .expert-location {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .expert-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .expert-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: var(--light);
+    border-radius: 6px;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 5px;
+  }
+
+  .stat-value {
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+
+  .status-verified {
+    color: #2e7d32 !important;
+  }
+
+  .status-pending {
+    color: #f57c00 !important;
+  }
+
+  .expert-bio {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-light);
+  }
+
+  .expert-bio p {
+    margin: 0;
+    color: var(--dark);
+    font-style: italic;
+  }
+
+  .expert-certification {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #e8f5e9;
+    border-radius: 6px;
+    color: var(--primary-dark);
+  }
+
+  .expert-certification i {
+    color: var(--primary);
+  }
+
+  .expert-actions {
+    text-align: center;
+  }
+
+  .no-experts {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--gray);
+  }
+
+  .no-experts i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    color: var(--light-gray);
+  }
+
+  /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .modal-header h3 {
+    margin: 0;
+    color: var(--primary-dark);
+  }
+
+  .close {
+    color: var(--gray);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+  }
+
+  .close:hover {
+    color: var(--primary);
+  }
+
+  .modal form {
+    padding: 25px;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 768px) {
+    .experts-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .expert-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .expert-details {
+      grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+      margin: 10% auto;
+      width: 95%;
+    }
+
+    .modal-actions {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %} {% block extra_js %}
+<script>
+  let selectedExpertId = null;
+
+  function openConsultationModal(expertId, expertName) {
+    selectedExpertId = expertId;
+    document.getElementById("consultation-modal").style.display = "block";
+    document.querySelector(
+      ".modal-header h3"
+    ).textContent = `Request Consultation with ${expertName}`;
+  }
+
+  function closeConsultationModal() {
+    document.getElementById("consultation-modal").style.display = "none";
+    document.getElementById("consultation-form").reset();
+    selectedExpertId = null;
+  }
+
+  document
+    .getElementById("consultation-form")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const subject = document.getElementById("consultation-subject").value;
+      const description = document.getElementById(
+        "consultation-description"
+      ).value;
+
+      if (!selectedExpertId) {
+        alert("Please select an expert");
+        return;
+      }
+
+      // Show loading state
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = "Sending...";
+      submitBtn.disabled = true;
+
+      fetch("/api/request-consultation/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify({
+          expert_id: selectedExpertId,
+          subject: subject,
+          description: description,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            alert("Consultation request sent successfully!");
+            closeConsultationModal();
+          } else {
+            alert("Error: " + data.error);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Failed to send consultation request");
+        })
+        .finally(() => {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        });
+    });
+
+  // Close modal when clicking outside
+  window.onclick = function (event) {
+    const modal = document.getElementById("consultation-modal");
+    if (event.target === modal) {
+      closeConsultationModal();
+    }
+  };
+
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}

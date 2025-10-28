@@ -1,0 +1,594 @@
+{% extends 'base.html' %} {% block title %}Register - FarmSmart{% endblock %}
+{%block content %}
+<section class="auth-section">
+  <div class="container">
+    <div class="auth-container">
+      <div class="auth-card">
+        <div class="auth-header">
+          <div class="auth-logo">
+            <i class="fas fa-seedling"></i>
+            <span>FarmSmart</span>
+          </div>
+          <h2>Join FarmSmart</h2>
+          <p>
+            Create your account to access AI-powered agricultural insights and
+            expert consultations
+          </p>
+        </div>
+
+        {% if messages %} {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i
+            class="fas fa-{% if message.tags == 'error' %}exclamation-triangle{% elif message.tags == 'success' %}check-circle{% else %}info-circle{% endif %}"
+          ></i>
+          {{ message }}
+        </div>
+        {% endfor %} {% endif %}
+
+        <form method="post" class="auth-form" id="register-form">
+          {% csrf_token %}
+
+          <!-- Account Type Selection -->
+          <div class="form-group">
+            <label>
+              <i class="fas fa-users"></i>
+              Account Type
+            </label>
+            <div class="account-type-selector">
+              <label class="account-type-option">
+                <input
+                  type="radio"
+                  name="account_type"
+                  value="customer"
+                  checked
+                />
+                <div class="account-type-card">
+                  <i class="fas fa-seedling"></i>
+                  <h4>Farmer</h4>
+                  <p>
+                    I'm a farmer looking for crop recommendations and expert
+                    advice
+                  </p>
+                </div>
+              </label>
+              <label class="account-type-option">
+                <input type="radio" name="account_type" value="expert" />
+                <div class="account-type-card">
+                  <i class="fas fa-user-tie"></i>
+                  <h4>Expert</h4>
+                  <p>
+                    I'm an agricultural expert offering consultation services
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Personal Information -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name">
+                <i class="fas fa-user"></i>
+                First Name
+              </label>
+              <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="last_name">
+                <i class="fas fa-user"></i>
+                Last Name
+              </label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="username">
+              <i class="fas fa-at"></i>
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Choose a username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">
+              <i class="fas fa-envelope"></i>
+              Email Address
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Enter your email address"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password1">
+              <i class="fas fa-lock"></i>
+              Password
+            </label>
+            <input
+              type="password"
+              id="password1"
+              name="password1"
+              placeholder="Create a strong password"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password2">
+              <i class="fas fa-lock"></i>
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              id="password2"
+              name="password2"
+              placeholder="Confirm your password"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="location">
+              <i class="fas fa-map-marker-alt"></i>
+              Location
+            </label>
+            <input
+              type="text"
+              id="location"
+              name="location"
+              placeholder="Enter your location (e.g., Harare, Zimbabwe)"
+              required
+            />
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-container">
+              <input type="checkbox" name="terms_accepted" required />
+              <span class="checkmark"></span>
+              I agree to the
+              <a href="#" class="terms-link">Terms of Service</a> and
+              <a href="#" class="privacy-link">Privacy Policy</a>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary auth-btn">
+            <i class="fas fa-user-plus"></i>
+            <span>Create Account</span>
+          </button>
+        </form>
+
+        <div class="auth-divider">
+          <span>or</span>
+        </div>
+
+        <div class="auth-footer">
+          <p>
+            Already have an account?
+            <a href="{% url 'main:login' %}" class="login-link">
+              <i class="fas fa-sign-in-alt"></i>
+              Sign In
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_css %}
+<style>
+  /* Hide navigation on auth pages */
+  header {
+    display: none;
+  }
+
+  /* Professional Register Page Styles */
+  .auth-section {
+    min-height: 100vh;
+    background: linear-gradient(
+      135deg,
+      var(--bg-secondary) 0%,
+      var(--light) 100%
+    );
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+  }
+
+  .auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+
+  .auth-card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px var(--shadow-medium);
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid var(--border-light);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .auth-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .auth-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 24px;
+  }
+
+  .auth-logo i {
+    font-size: 2.2rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .auth-header h2 {
+    color: var(--text-primary);
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .auth-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .auth-form {
+    margin-bottom: 32px;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+  }
+
+  .form-group label i {
+    color: var(--primary);
+    width: 16px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border-light);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--white);
+    color: var(--text-primary);
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+  }
+
+  .form-group input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .account-type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 8px;
+  }
+
+  .account-type-option {
+    cursor: pointer;
+  }
+
+  .account-type-option input[type="radio"] {
+    display: none;
+  }
+
+  .account-type-card {
+    padding: 20px;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: var(--white);
+  }
+
+  .account-type-card i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+
+  .account-type-card h4 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .account-type-card p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .account-type-option input[type="radio"]:checked + .account-type-card {
+    border-color: var(--primary);
+    background: rgba(46, 125, 50, 0.05);
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+  }
+
+  .form-options {
+    margin-bottom: 32px;
+  }
+
+  .checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .checkbox-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary);
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .terms-link,
+  .privacy-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .terms-link:hover,
+  .privacy-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  .auth-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(46, 125, 50, 0.3);
+  }
+
+  .auth-divider {
+    text-align: center;
+    margin: 32px 0;
+    position: relative;
+  }
+
+  .auth-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-light);
+  }
+
+  .auth-divider span {
+    background: var(--white);
+    color: var(--text-muted);
+    padding: 0 16px;
+    font-size: 0.9rem;
+    position: relative;
+  }
+
+  .auth-footer {
+    text-align: center;
+  }
+
+  .auth-footer p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .login-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 4px;
+    transition: all 0.3s ease;
+  }
+
+  .login-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+
+  .alert {
+    padding: 16px 20px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.95rem;
+  }
+
+  .alert i {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .alert-error {
+    background: rgba(211, 47, 47, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(211, 47, 47, 0.2);
+  }
+
+  .alert-success {
+    background: rgba(46, 125, 50, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(46, 125, 50, 0.2);
+  }
+
+  .alert-info {
+    background: rgba(25, 118, 210, 0.1);
+    color: var(--info);
+    border: 1px solid rgba(25, 118, 210, 0.2);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .auth-section {
+      padding: 10px 0;
+    }
+
+    .auth-card {
+      padding: 32px 24px;
+      margin: 0 16px;
+      border-radius: 12px;
+    }
+
+    .auth-header h2 {
+      font-size: 1.6rem;
+    }
+
+    .auth-logo {
+      font-size: 1.6rem;
+    }
+
+    .auth-logo i {
+      font-size: 2rem;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .account-type-selector {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .form-group input {
+      padding: 12px 14px;
+    }
+
+    .auth-btn {
+      padding: 14px;
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .auth-card {
+      padding: 24px 20px;
+      margin: 0 12px;
+    }
+
+    .auth-header h2 {
+      font-size: 1.4rem;
+    }
+
+    .auth-logo {
+      font-size: 1.4rem;
+    }
+
+    .account-type-card {
+      padding: 16px;
+    }
+
+    .account-type-card i {
+      font-size: 1.8rem;
+    }
+  }
+</style>
+{% endblock %}
