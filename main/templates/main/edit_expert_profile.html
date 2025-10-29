@@ -1,5 +1,6 @@
-{% extends 'base.html' %} {% block title %}Edit Expert Profile - FarmSmart{%
-endblock %} {% block content %}
+{% extends 'base.html' %} 
+{% block title %}Edit Expert Profile - FarmSmart{%endblock %} 
+{% block content %}
 <section class="edit-profile-section">
   <div class="container">
     <div class="profile-header">
@@ -98,14 +99,19 @@ endblock %} {% block content %}
                 <i class="fas fa-map-marker-alt"></i>
                 Location
               </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                value="{{ profile.location }}"
-                placeholder="e.g., Harare, Zimbabwe"
-                class="form-control"
-              />
+              <select id="location" name="location" class="form-control" required>
+                <option value="">Select Farming Region</option>
+                <option value="Harare" {% if profile.location == "Harare" %}selected{% endif %}>Harare</option>
+                <option value="Bulawayo" {% if profile.location == "Bulawayo" %}selected{% endif %}>Bulawayo</option>
+                <option value="Manicaland" {% if profile.location == "Manicaland" %}selected{% endif %}>Manicaland</option>
+                <option value="Mashonaland Central" {% if profile.location == "Mashonaland Central" %}selected{% endif %}>Mashonaland Central</option>
+                <option value="Mashonaland East" {% if profile.location == "Mashonaland East" %}selected{% endif %}>Mashonaland East</option>
+                <option value="Mashonaland West" {% if profile.location == "Mashonaland West" %}selected{% endif %}>Mashonaland West</option>
+                <option value="Masvingo" {% if profile.location == "Masvingo" %}selected{% endif %}>Masvingo</option>
+                <option value="Matabeleland North" {% if profile.location == "Matabeleland North" %}selected{% endif %}>Matabeleland North</option>
+                <option value="Matabeleland South" {% if profile.location == "Matabeleland South" %}selected{% endif %}>Matabeleland South</option>
+                <option value="Midlands" {% if profile.location == "Midlands" %}selected{% endif %}>Midlands</option>
+              </select>
             </div>
 
             <div class="form-group">

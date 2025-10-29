@@ -21,8 +21,12 @@
               {{ expert.profile.specialization|default:"Agricultural Expert" }}
             </p>
             <p class="expert-location">
-              <i class="fas fa-map-marker-alt"></i> {{
-              expert.profile.location|default:"Location not specified" }}
+              <i class="fas fa-map-marker-alt"></i> 
+              {% if expert.profile.location %}
+                {{ expert.profile.location }}
+              {% else %}
+                <span class="location-not-specified">Location not specified</span>
+              {% endif %}
             </p>
           </div>
         </div>
@@ -42,6 +46,17 @@
             >
           </div>
           {% endif %}
+          <div class="expert-stat">
+            <span class="stat-label">Location</span>
+            <span class="stat-value location-stat">
+              <i class="fas fa-map-marker-alt"></i>
+              {% if expert.profile.location %}
+                {{ expert.profile.location }}
+              {% else %}
+                <span class="location-not-specified">Not specified</span>
+              {% endif %}
+            </span>
+          </div>
           <div class="expert-stat">
             <span class="stat-label">Status</span>
             <span
@@ -67,7 +82,7 @@
           {% if user.is_authenticated and not user.profile.is_expert %}
           <button
             class="btn btn-primary"
-            onclick="openConsultationModal({{ expert.id }}, '{{ expert.get_full_name }}')"
+            onclick="openConsultationModal({{ expert.id }}, '{{ expert.get_full_name }}', '{{ expert.profile.location|default:"Location not specified" }}')"
           >
             Request Consultation
           </button>
@@ -104,6 +119,8 @@
     <div class="modal-header">
       <h3>Request Consultation</h3>
       <span class="close" onclick="closeConsultationModal()">&times;</span>
+    </div>
+    <div class="expert-location-info" style="display: none; padding: 10px 25px; background: #f8f9fa; border-bottom: 1px solid var(--light-gray); color: var(--primary); font-weight: 500;">
     </div>
     <form id="consultation-form">
       <div class="form-group">
@@ -203,6 +220,29 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    font-weight: 500;
+  }
+
+  .expert-location i {
+    color: var(--primary);
+    font-size: 0.8rem;
+  }
+
+  .location-not-specified {
+    color: #999;
+    font-style: italic;
+  }
+
+  .location-stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+  }
+
+  .location-stat i {
+    color: var(--primary);
+    font-size: 0.8rem;
   }
 
   .expert-details {
@@ -372,12 +412,23 @@
 <script>
   let selectedExpertId = null;
 
-  function openConsultationModal(expertId, expertName) {
+  function openConsultationModal(expertId, expertName, expertLocation) {
     selectedExpertId = expertId;
     document.getElementById("consultation-modal").style.display = "block";
     document.querySelector(
       ".modal-header h3"
     ).textContent = `Request Consultation with ${expertName}`;
+    
+    // Add location info to modal if available
+    const locationInfo = document.querySelector('.expert-location-info');
+    if (locationInfo) {
+      if (expertLocation && expertLocation !== 'Location not specified') {
+        locationInfo.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${expertLocation}`;
+        locationInfo.style.display = 'block';
+      } else {
+        locationInfo.style.display = 'none';
+      }
+    }
   }
 
   function closeConsultationModal() {

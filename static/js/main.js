@@ -1,63 +1,85 @@
 // Form submission for crop recommendations
-document.getElementById("farm-form").addEventListener("submit", function (e) {
-  e.preventDefault();
+// Wait for DOM to be ready
+document.addEventListener("DOMContentLoaded", function () {
+  const farmForm = document.getElementById("farm-form");
+  if (farmForm) {
+    farmForm.addEventListener("submit", function (e) {
+      e.preventDefault();
 
-  // Check if user is authenticated
-  const isAuthenticated = document.querySelector(".user-menu") !== null;
-  if (!isAuthenticated) {
-    alert("Please login to get crop recommendations.");
-    window.location.href = "/login/";
-    return;
-  }
+      // Get form values
+      const landSize = document.getElementById("land-size").value;
+      const soilType = document.getElementById("soil-type").value;
+      const location = document.getElementById("location").value;
+      const fertilizer = document.getElementById("fertilizer").value;
+      const waterAccess = document.getElementById("water-access").value;
 
-  // Get form values
-  const landSize = document.getElementById("land-size").value;
-  const soilType = document.getElementById("soil-type").value;
-  const location = document.getElementById("location").value;
-  const fertilizer = document.getElementById("fertilizer").value;
-  const waterAccess = document.getElementById("water-access").value;
+      // Show loading state
+      const resultsDiv = document.getElementById("recommendation-results");
+      resultsDiv.innerHTML =
+        '<div class="recommendation"><p><i class="fas fa-spinner fa-spin"></i> Analyzing your farm data and generating recommendations...</p></div>';
 
-  // Show loading state
-  const resultsDiv = document.getElementById("recommendation-results");
-  resultsDiv.innerHTML =
-    '<div class="recommendation"><p><i class="fas fa-spinner fa-spin"></i> Analyzing your farm data and generating recommendations...</p></div>';
+      // Prepare data for API call
+      const formData = {
+        land_size: parseFloat(landSize),
+        soil_type: soilType,
+        location: location,
+        fertilizer_type: fertilizer,
+        water_access: waterAccess,
+      };
 
-  // Prepare data for API call
-  const formData = {
-    land_size: parseFloat(landSize),
-    soil_type: soilType,
-    location: location,
-    fertilizer_type: fertilizer,
-    water_access: waterAccess,
-  };
+      // Make API call to Django backend
+      fetch("/api/crop-recommendations/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify(formData),
+      })
+        .then((response) => {
+          // Check if response is a redirect or authentication error
+          // Django's @login_required redirects (302) to login page when not authenticated
+          if (
+            response.status === 401 ||
+            response.status === 403 ||
+            response.redirected
+          ) {
+            alert("Please login to get crop recommendations.");
+            window.location.href = "/login/";
+            return;
+          }
 
-  // Make API call to Django backend
-  fetch("/api/crop-recommendations/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCookie("csrftoken"),
-    },
-    body: JSON.stringify(formData),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        displayRecommendations(data.recommendations, formData);
-      } else {
-        resultsDiv.innerHTML = `<div class="recommendation" style="background: #ffebee; border-left-color: #f44336;">
+          // Check if response is JSON, if not it might be a redirect to login page
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            // Likely redirected to login page
+            alert("Please login to get crop recommendations.");
+            window.location.href = "/login/";
+            return;
+          }
+
+          return response.json();
+        })
+        .then((data) => {
+          if (!data) return; // Exit if we redirected
+          if (data.success) {
+            displayRecommendations(data.recommendations, formData);
+          } else {
+            resultsDiv.innerHTML = `<div class="recommendation" style="background: #ffebee; border-left-color: #f44336;">
                 <h3>Error</h3>
-                <p>${data.error}</p>
+                <p>${data.error || "An error occurred. Please try again."}</p>
             </div>`;
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      resultsDiv.innerHTML = `<div class="recommendation" style="background: #ffebee; border-left-color: #f44336;">
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          resultsDiv.innerHTML = `<div class="recommendation" style="background: #ffebee; border-left-color: #f44336;">
             <h3>Error</h3>
             <p>Failed to get recommendations. Please try again.</p>
         </div>`;
+        });
     });
+  }
 });
 
 // Function to display recommendations
@@ -294,48 +316,50 @@ function getAlertColor(type) {
 }
 
 // Blog post submission
-document.getElementById("blog-form").addEventListener("submit", function (e) {
-  e.preventDefault();
-  const content = document.getElementById("blog-content").value;
+// Wait for DOM to be ready (if not already)
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initBlogForm);
+} else {
+  initBlogForm();
+}
 
-  if (content.trim() === "") return;
+function initBlogForm() {
+  const blogForm = document.getElementById("blog-form");
+  if (blogForm) {
+    blogForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const content = document.getElementById("blog-content").value;
 
-  // Check if user is authenticated
-  const isAuthenticated = document.querySelector(".user-menu") !== null;
-  if (!isAuthenticated) {
-    alert("Please login to post in the community.");
-    window.location.href = "/login/";
-    return;
-  }
+      if (content.trim() === "") return;
 
-  // Show loading state
-  const submitBtn = this.querySelector('button[type="submit"]');
-  const originalText = submitBtn.textContent;
-  submitBtn.textContent = "Posting...";
-  submitBtn.disabled = true;
+      // Show loading state
+      const submitBtn = this.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = "Posting...";
+      submitBtn.disabled = true;
 
-  // Prepare data for API call
-  const postData = {
-    content: content,
-  };
+      // Prepare data for API call
+      const postData = {
+        content: content,
+      };
 
-  // Make API call to Django backend
-  fetch("/api/community-posts/", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-CSRFToken": getCookie("csrftoken"),
-    },
-    body: JSON.stringify(postData),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.success) {
-        // Add the new post to the top of the list
-        const blogPostsDiv = document.getElementById("blog-posts");
-        const newPost = document.createElement("div");
-        newPost.className = "blog-post";
-        newPost.innerHTML = `
+      // Make API call to Django backend
+      fetch("/api/community-posts/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCookie("csrftoken"),
+        },
+        body: JSON.stringify(postData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            // Add the new post to the top of the list
+            const blogPostsDiv = document.getElementById("blog-posts");
+            const newPost = document.createElement("div");
+            newPost.className = "blog-post";
+            newPost.innerHTML = `
                 <div class="blog-meta">
                     <span><i class="fas fa-user"></i> ${data.post.author_name}</span>
                     <span><i class="far fa-clock"></i> ${data.post.created_at}</span>
@@ -343,19 +367,21 @@ document.getElementById("blog-form").addEventListener("submit", function (e) {
                 <p>${data.post.content}</p>
             `;
 
-        blogPostsDiv.prepend(newPost);
-        document.getElementById("blog-content").value = "";
-      } else {
-        alert("Error posting: " + data.error);
-      }
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-      alert("Failed to post. Please try again.");
-    })
-    .finally(() => {
-      // Reset button state
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
+            blogPostsDiv.prepend(newPost);
+            document.getElementById("blog-content").value = "";
+          } else {
+            alert("Error posting: " + data.error);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("Failed to post. Please try again.");
+        })
+        .finally(() => {
+          // Reset button state
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        });
     });
-});
+  }
+}
