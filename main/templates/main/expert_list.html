@@ -1,5 +1,5 @@
 {% extends 'base.html' %} 
-{% block title %}Agricultural Experts - FarmSmart{%endblock %} 
+{% block title %}Agricultural Experts -FarmSmart{%endblock %} 
 {% block content %}
 <section class="experts-section">
   <div class="container">
@@ -47,7 +47,7 @@
             <span
               class="stat-value status-{% if expert.profile.is_verified %}verified{% else %}pending{% endif %}"
             >
-              {% if expert.profile.is_verified %}Verified{% else %}Pending{% endif %}
+              {% if expert.profile.is_verified %}Verified{% else %}Pending{%endif %}
             </span>
           </div>
         </div>

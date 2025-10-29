@@ -1,6 +1,5 @@
-{% extends 'base.html' %} 
-{% block title %}Edit Expert Profile - FarmSmart{% endblock %}
-{% block content %}
+{% extends 'base.html' %} {% block title %}Edit Expert Profile - FarmSmart{%
+endblock %} {% block content %}
 <section class="edit-profile-section">
   <div class="container">
     <div class="profile-header">
@@ -146,7 +145,8 @@
               placeholder="Describe your background, areas of expertise, and how you can help farmers..."
               class="form-control"
             >
-{{ profile.bio }}</textarea>
+{{ profile.bio }}</textarea
+            >
           </div>
         </div>
 
@@ -251,9 +251,7 @@
     </div>
   </div>
 </section>
-{% endblock %}
-
-{% block extra_css %}
+{% endblock %} {% block extra_css %}
 <style>
   .edit-profile-section {
     padding: 40px 0;
