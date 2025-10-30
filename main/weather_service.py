@@ -179,6 +179,7 @@ class WeatherService:
             
             weather_data = current_weather['data']
             alerts = []
+            irrigation_advice = self._generate_irrigation_advice(weather_data)
             
             # Temperature alerts
             if weather_data['temperature'] > 35:
@@ -234,7 +235,8 @@ class WeatherService:
                 'success': True,
                 'data': {
                     'alerts': alerts,
-                    'current_weather': weather_data
+                    'current_weather': weather_data,
+                    'irrigation_advice': irrigation_advice
                 }
             }
             
@@ -244,6 +246,63 @@ class WeatherService:
                 'success': False,
                 'error': f'Error generating alerts: {str(e)}'
             }
+
+    def _generate_irrigation_advice(self, weather_data):
+        """Generate concise, actionable irrigation guidance for the day based on weather."""
+        temp = weather_data.get('temperature')
+        humidity = weather_data.get('humidity')
+        wind = weather_data.get('wind_speed')
+        desc = (weather_data.get('description') or '').lower()
+
+        # Rain-first rule
+        if 'rain' in desc or 'drizzle' in desc or 'shower' in desc:
+            return (
+                "Rain expected today—skip irrigation and leverage natural rainfall. "
+                "Check drainage in low-lying areas and resume normal schedule tomorrow if soils dry."
+            )
+
+        # Temperature-driven guidance
+        if temp is not None:
+            if temp > 35:
+                base = (
+                    "Very hot conditions—irrigate early morning and/or late evening to reduce losses. "
+                    "Increase frequency, use mulch to conserve moisture, and avoid midday irrigation."
+                )
+            elif 28 < temp <= 35:
+                base = (
+                    "Hot day—maintain schedule and consider a short top‑up cycle this evening. "
+                    "Prioritize deep, infrequent watering over light sprinkles."
+                )
+            elif 18 <= temp <= 28:
+                base = (
+                    "Mild conditions—follow your normal schedule. Irrigate in the morning for best uptake."
+                )
+            elif 5 <= temp < 18:
+                base = (
+                    "Cool day—reduce irrigation frequency by ~20–30%. Water mid‑morning if needed to avoid overnight wet soils."
+                )
+            else:  # temp < 5
+                base = (
+                    "Frost risk—avoid irrigation overnight and early morning. Only water at midday if soil is dry and plants show stress."
+                )
+        else:
+            base = "Follow your normal schedule and check soil moisture before watering."
+
+        # Humidity modifiers
+        modifiers = []
+        if humidity is not None:
+            if humidity > 80:
+                modifiers.append("High humidity—watch for fungal disease; avoid late‑evening watering.")
+            elif humidity < 30:
+                modifiers.append("Very dry air—check moisture more often and ensure adequate mulching.")
+
+        # Wind modifiers
+        if wind is not None and wind > 15:
+            modifiers.append("Strong winds—use drip/low‑angle sprinklers and shield young plants.")
+
+        if modifiers:
+            return base + " " + " ".join(modifiers)
+        return base
 
 # Global instance
 weather_service = WeatherService()

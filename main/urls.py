@@ -18,7 +18,6 @@ urlpatterns = [
     path('edit-expert-profile/', views.edit_expert_profile, name='edit_expert_profile'),
     
     # User-specific pages
-    path('my-farm-data/', views.my_farm_data, name='my_farm_data'),
     path('experts/', views.expert_list, name='expert_list'),
     path('respond-consultation/<int:consultation_id>/', views.respond_consultation, name='respond_consultation'),
     

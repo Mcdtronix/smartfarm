@@ -16,9 +16,15 @@ def index(request):
     """Main homepage view"""
     # Get recent community posts
     recent_posts = CommunityPost.objects.all()[:5]
+    # Get a few experts to showcase on homepage
+    experts = User.objects.filter(
+        is_active=True,
+        profile__account_type='expert'
+    ).select_related('profile').order_by('-date_joined')[:3]
     
     context = {
         'recent_posts': recent_posts,
+        'experts': experts,
     }
     return render(request, 'main/index.html', context)
 
@@ -382,14 +388,7 @@ def get_recent_posts(request):
             'error': f'Server error: {str(e)}'
         })
 
-@login_required
-def my_farm_data(request):
-    """View user's farm data and recommendations"""
-    farm_data = FarmData.objects.filter(user=request.user).order_by('-created_at')
-    context = {
-        'farm_data': farm_data,
-    }
-    return render(request, 'main/my_farm_data.html', context)
+
 
 @login_required
 def expert_list(request):
@@ -520,7 +519,8 @@ def get_weather_alerts(request):
         return JsonResponse({
             'success': True,
             'alerts': alerts['data']['alerts'],
-            'current_weather': alerts['data']['current_weather']
+            'current_weather': alerts['data']['current_weather'],
+            'irrigation_advice': alerts['data'].get('irrigation_advice')
         })
         
     except Exception as e:

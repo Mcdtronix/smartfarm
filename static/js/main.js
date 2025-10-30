@@ -226,7 +226,6 @@ function displayWeatherForecast(forecastData) {
 
 function loadWeatherAlerts() {
   const alertContainer = document.querySelector(".weather-alert");
-  if (!alertContainer) return;
 
   // Get user's location from the farm form or use default
   const locationInput = document.getElementById("location");
@@ -235,22 +234,40 @@ function loadWeatherAlerts() {
   fetch(`/api/weather/alerts/?city=${encodeURIComponent(city)}`)
     .then((response) => response.json())
     .then((data) => {
-      if (data.success && data.alerts.length > 0) {
-        displayWeatherAlerts(data.alerts);
-      } else {
-        // Show default alert if no specific alerts
-        alertContainer.innerHTML = `
-          <i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.5rem"></i>
-          <div>
-            <h3>Weather Monitoring Active</h3>
-            <p>Weather conditions are being monitored for your area. Check back for updates.</p>
-          </div>
-        `;
+      if (alertContainer) {
+        if (data.success && data.alerts && data.alerts.length > 0) {
+          displayWeatherAlerts(data.alerts);
+        } else {
+          // Show default alert if no specific alerts
+          alertContainer.innerHTML = `
+            <i class="fas fa-info-circle" style="color: var(--primary); font-size: 1.5rem"></i>
+            <div>
+              <h3>Weather Monitoring Active</h3>
+              <p>Weather conditions are being monitored for your area. Check back for updates.</p>
+            </div>
+          `;
+        }
+      }
+
+      // Populate irrigation advice regardless of alerts availability
+      const adviceEl = document.getElementById("irrigation-advice");
+      if (adviceEl) {
+        if (data.success && data.irrigation_advice) {
+          adviceEl.textContent = data.irrigation_advice;
+        } else {
+          adviceEl.textContent =
+            "Check soil moisture at 10–15 cm depth and irrigate only if the soil feels dry.";
+        }
       }
     })
     .catch((error) => {
       console.error("Error loading weather alerts:", error);
       // Keep default alert on error
+      const adviceEl = document.getElementById("irrigation-advice");
+      if (adviceEl) {
+        adviceEl.textContent =
+          "Unable to load weather data. Follow your normal schedule and verify soil moisture before watering.";
+      }
     });
 }
 

@@ -163,9 +163,8 @@
           <i class="fas fa-tint"></i>
           <h3>Irrigation Advice</h3>
         </div>
-        <p>
-          Based on current soil moisture levels, reduce irrigation frequency by
-          20% this week.
+        <p id="irrigation-advice">
+          Loading irrigation advice for today...
         </p>
       </div>
     </div>
@@ -245,52 +244,52 @@
     </div>
 
     <div class="grid-3">
+      {% for expert in experts %}
       <div class="card expert-card">
-        <img
-          src="https://randomuser.me/api/portraits/men/32.jpg"
-          alt="Expert"
-          class="expert-img"
-        />
-        <h3>Dr. Robert Kimani</h3>
-        <p>Soil Scientist</p>
-        <p>10 years experience</p>
-        <button class="btn btn-outline" style="margin-top: 15px">
-          Contact Expert
-        </button>
-      </div>
+        <div class="expert-card-header" style="display:flex; align-items:center; gap:12px;">
+          <div class="expert-avatar" style="width:56px; height:56px; border-radius:50%; background: var(--primary-light); display:flex; align-items:center; justify-content:center; color:#fff;">
+            <i class="fas fa-user-tie"></i>
+          </div>
+          <div>
+            <h3 style="margin:0;">{{ expert.get_full_name }}</h3>
+            <p style="margin:2px 0 0; color: var(--primary); font-weight:600;">
+              {{ expert.profile.specialization|default:"Agricultural Expert" }}
+              {% if expert.profile.is_verified %}
+                <span style="margin-left:6px; font-size:0.8rem; color:#2e7d32;">✔ Verified</span>
+              {% endif %}
+            </p>
+          </div>
+        </div>
 
-      <div class="card expert-card">
-        <img
-          src="https://randomuser.me/api/portraits/women/44.jpg"
-          alt="Expert"
-          class="expert-img"
-        />
-        <h3>Dr. Amina Omondi</h3>
-        <p>Crop Protection Specialist</p>
-        <p>8 years experience</p>
-        <button class="btn btn-outline" style="margin-top: 15px">
-          Contact Expert
-        </button>
-      </div>
+        <div class="expert-meta" style="margin-top:12px; color: var(--gray); font-size:0.9rem;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <i class="fas fa-briefcase" style="color: var(--primary);"></i>
+            <span>{{ expert.profile.experience_years|default:0 }} years experience</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+            <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i>
+            <span>{{ expert.profile.location|default:"Location not specified" }}</span>
+          </div>
+        </div>
 
-      <div class="card expert-card">
-        <img
-          src="https://randomuser.me/api/portraits/men/76.jpg"
-          alt="Expert"
-          class="expert-img"
-        />
-        <h3>Prof. James Otieno</h3>
-        <p>Agricultural Economist</p>
-        <p>15 years experience</p>
-        <button class="btn btn-outline" style="margin-top: 15px">
-          Contact Expert
-        </button>
+        <div style="margin-top:14px;">
+          <a href="{% url 'main:expert_list' %}" class="btn btn-outline">View Profile</a>
+          {% if user.is_authenticated and not user.profile.is_expert %}
+          <a href="{% url 'main:expert_list' %}" class="btn btn-primary" style="margin-left:8px;">Request Consultation</a>
+          {% endif %}
+        </div>
       </div>
+      {% empty %}
+      <div class="card" style="grid-column:1/-1; text-align:center; padding:24px;">
+        <p>No experts available yet. Check back soon.</p>
+        <a href="{% url 'main:expert_list' %}" class="btn btn-primary" style="margin-top:8px;">View All Experts</a>
+      </div>
+      {% endfor %}
     </div>
 
     <div style="text-align: center; margin-top: 30px">
-      <button class="btn btn-primary">View All Experts</button>
+      <a class="btn btn-primary" href="{% url 'main:expert_list' %}">View All Experts</a>
     </div>
   </div>
-</section>
+  </section>
 {% endblock %}
